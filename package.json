@@ -1,0 +1,25 @@
+{
+  "name": "checkin-asrama",
+  "version": "1.0.0",
+  "description": "Aplikasi check-in kedatangan santri kembali ke asrama",
+  "main": "checkin-asrama-config.js",
+  "scripts": {
+    "build:css": "tailwindcss -i ./src/input.css -o ./dist/tailwind.css",
+    "watch:css": "tailwindcss -i ./src/input.css -o ./dist/tailwind.css --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fadiahaswat/checkin-asrama.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fadiahaswat/checkin-asrama/issues"
+  },
+  "homepage": "https://github.com/fadiahaswat/checkin-asrama#readme",
+  "devDependencies": {
+    "tailwindcss": "^3.4.19"
+  }
+}
