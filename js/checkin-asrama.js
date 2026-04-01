@@ -96,6 +96,10 @@ function normalizeSantriData(raw) {
         Object.keys(item).forEach(key => {
             normalized[key.toLowerCase().trim()] = item[key];
         });
+        // Normalize asrama: treat "-" placeholder (used by code.gs when column is empty) as unassigned
+        if (normalized.asrama === '-') normalized.asrama = '';
+        // Alias kelas → rombel so display helpers always have a consistent field
+        if (!normalized.rombel && normalized.kelas) normalized.rombel = normalized.kelas;
         acc.push(normalized);
         return acc;
     }, []);
@@ -130,7 +134,11 @@ async function loadSantriDataWithCache() {
 function buildSantriListForAsrama(allSantri, asrama) {
     if (!asrama.filterKey) return allSantri;
     const key = asrama.filterKey.toLowerCase();
-    return allSantri.filter(s => (s.asrama || '').toLowerCase().includes(key));
+    return allSantri.filter(s => {
+        const studentAsrama = (s.asrama || '').toLowerCase().trim();
+        // Include student if asrama is unassigned (empty) or matches filterKey
+        return !studentAsrama || studentAsrama.includes(key);
+    });
 }
 
 // ─── Check-in Operations ──────────────────────────────────────
