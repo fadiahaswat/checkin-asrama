@@ -71,6 +71,36 @@ function showNotif(msg, type = 'success') {
 }
 
 // ─── Data Loading ─────────────────────────────────────────────
+
+/**
+ * Normalizes the santri data returned by the API:
+ * - Unwraps common response envelope shapes ({ data: [...] }, { records: [...] }, etc.)
+ * - Lowercases all field keys so the rest of the app can rely on s.nis, s.nama,
+ *   s.asrama, s.rombel, s.kelas regardless of how the spreadsheet column headers
+ *   are capitalised.
+ */
+function normalizeSantriData(raw) {
+    let records = raw;
+
+    // Unwrap common envelope patterns returned by Google Apps Script
+    if (!Array.isArray(records) && records !== null && typeof records === 'object') {
+        records = records.data || records.records || records.santri ||
+                  records.students || records.list || [];
+    }
+
+    if (!Array.isArray(records)) return [];
+
+    return records.reduce((acc, item) => {
+        if (item === null || typeof item !== 'object' || Array.isArray(item)) return acc;
+        const normalized = {};
+        Object.keys(item).forEach(key => {
+            normalized[key.toLowerCase().trim()] = item[key];
+        });
+        acc.push(normalized);
+        return acc;
+    }, []);
+}
+
 async function loadSantriDataWithCache() {
     const cachedData = localStorage.getItem(CACHE.KEY);
     const cachedTime = localStorage.getItem(CACHE.TIME_KEY);
@@ -757,7 +787,7 @@ async function init() {
     try {
         if (statusEl) statusEl.textContent = 'Mengunduh data santri...';
         const data = await loadSantriDataWithCache();
-        window._checkinAllSantri = Array.isArray(data) ? data : [];
+        window._checkinAllSantri = normalizeSantriData(data);
         if (statusEl) statusEl.textContent = 'Data siap!';
     } catch (err) {
         console.error('Gagal memuat data santri:', err);
